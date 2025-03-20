@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sieges', function (Blueprint $table) {
             $table->id();
             $table->integer('numero');
-            $table->string('type')->default('standard'); // Type de siège (standard, VIP, premium...)
+            $table->enum('type', ['standard', 'VIP'])->default('standard');
             $table->foreignId('salle_id')->nullable()->constrained('salles')->onDelete('set null');
             $table->timestamps();
         });
