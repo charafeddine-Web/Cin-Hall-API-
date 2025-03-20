@@ -13,18 +13,16 @@ class BaseRepository implements BaseRepositoryInterface{
         return $this->model->all();
     }
     public function create(array $data){
-
+        return $this->model->create($data);
     }
     public function update($id, array $data){
-
+        return $this->model->update($id, $data);
     }
     public function delete($id){
-
+        return $this->model->destroy($id);
     }
     public function find($id){
-
+        return $this->model->find($id);
     }
-
-
 
 }

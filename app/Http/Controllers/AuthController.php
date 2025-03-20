@@ -8,10 +8,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Repositories\UserRepositoryInterface;
 
 class AuthController extends Controller
 {
-/**
+    private $Userrepository;
+    public function __construct(UserRepositoryInterface $UserRepository)
+    {
+        return $this->Userrepository = $UserRepository;
+    }
+
+    /**
 * @OA\Post(
 *     path="/api/register",
 *     summary="Créer un nouvel utilisateur avec JWT",
@@ -33,7 +40,7 @@ class AuthController extends Controller
 
 public function register(Request $request)
 {
-        $validator = Validator::make($request->all(), [
+    $validator = Validator::make($request->all(), [
         'FullName' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:6|confirmed',
@@ -77,21 +84,25 @@ public function register(Request $request)
 */
 public function login(Request $request)
 {
-$credentials = $request->only('email', 'password');
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+        $user = $this->Userrepository->finbByEmail($credentials['email']);
 
-try {
-if (!$token = JWTAuth::attempt($credentials)) {
-return response()->json(['message' => 'Identifiants incorrects'], 401);
-}
-} catch (JWTException $e) {
-return response()->json(['message' => 'Erreur interne du serveur'], 500);
-}
+        try {
+            if (!$user | !$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['message' => 'Identifiants incorrects'], 401);
+        }
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Erreur interne du serveur'], 500);
+        }
 
-return response()->json([
-'message' => 'Connexion réussie',
-'user' => auth()->user(),
-'token' => $token
-], 200);
+        return response()->json([
+            'message' => 'Connexion réussie',
+            'user' => auth()->user(),
+            'token' => $token
+        ], 200);
 }
 
 /**
@@ -104,12 +115,12 @@ return response()->json([
 */
 public function logout(Request $request)
 {
-try {
-JWTAuth::invalidate(JWTAuth::getToken());
-return response()->json(['message' => 'Déconnexion réussie'], 200);
-} catch (JWTException $e) {
-return response()->json(['message' => 'Erreur lors de la déconnexion'], 500);
-}
+    try {
+        JWTAuth::invalidate(JWTAuth::getToken());
+        return response()->json(['message' => 'Déconnexion réussie'], 200);
+    } catch (JWTException $e) {
+        return response()->json(['message' => 'Erreur lors de la déconnexion'], 500);
+    }
 }
 
 /**
@@ -122,6 +133,6 @@ return response()->json(['message' => 'Erreur lors de la déconnexion'], 500);
 */
 public function user()
 {
-return response()->json(['user' => auth()->user()], 200);
+    return response()->json(['user' => auth()->user()], 200);
 }
 }

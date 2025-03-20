@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Paiements extends Model
 {
     use HasFactory;
+
+    protected $fillable=[
+        'montant',
+        'status',
+    ];
 }

@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('sieges', function (Blueprint $table) {
             $table->id();
+            $table->integer('numero');
+            $table->string('status');
+            $table->foreign('salle_id')->references('id')->on('salles');
             $table->timestamps();
         });
     }

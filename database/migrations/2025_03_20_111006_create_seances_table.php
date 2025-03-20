@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('seances', function (Blueprint $table) {
             $table->id();
+            $table->string('type');
+            $table->datetimes('date_heure');
+            $table->string('langue');
+            $table->foreign('film_id')->references('id')->on('films');
             $table->timestamps();
+
         });
     }
 

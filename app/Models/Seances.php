@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Seances extends Model
 {
     use HasFactory;
+
+    protected $fillable=[
+        'type',
+        'date_heure',
+        'langue',
+    ];
+
+
 }
