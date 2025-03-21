@@ -20,4 +20,8 @@ class roles extends Model
     public function hasPermission($permission) {
         return in_array($permission , $this->permissions);
     }
+
+    public function users() {
+        return $this->hasMany(User::class);
+    }
 }

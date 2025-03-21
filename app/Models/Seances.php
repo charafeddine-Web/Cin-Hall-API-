@@ -15,5 +15,9 @@ class Seances extends Model
         'langue',
     ];
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class,'reservations');
+    }
 
 }

@@ -12,4 +12,9 @@ class Reservations extends Model
     protected $fillable=[
         'status',
     ];
+
+
+    public function sieges(){
+        return $this->belongsTo(Sieges::class);
+    }
 }
