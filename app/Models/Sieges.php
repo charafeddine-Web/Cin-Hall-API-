@@ -13,4 +13,10 @@ class Sieges extends Model
         'numero',
         'status',
     ];
+
+
+    public function reservations()
+    {
+        return $this->belongstoMany(Reservations::class,'paiements')
+    }
 }

@@ -15,6 +15,6 @@ class Reservations extends Model
 
 
     public function sieges(){
-        return $this->belongsTo(Sieges::class);
+        return $this->belongsToMany(Sieges::class,'paiements');
     }
 }
