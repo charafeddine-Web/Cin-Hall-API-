@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+ use App\Models\Seances;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,9 +19,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'FullName',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -42,4 +44,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function seances(){
+        return $this->belongsToMany(Seances::class,'reservations');
+    }
+    public function roles(){
+        return $this->belongsTo(roles::class);
+    }
 }
