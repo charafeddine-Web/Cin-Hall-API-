@@ -17,4 +17,9 @@ class Filmes extends Model
         'age_minimum',
         'genre',
     ];
+
+    public function salles()
+    {
+        return $this->belongsToMany(Salles::class,'seances');
+    }
 }

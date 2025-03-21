@@ -14,4 +14,14 @@ class Salles extends Model
         'name',
         'type',
     ];
+
+
+
+    public function sieges(){
+        return $this->hasMany(Sieges::class);
+    }
+
+    public function filmes(){
+        return $this->belongsToMany(Filmes::class,'seances');
+    }
 }

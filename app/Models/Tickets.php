@@ -13,4 +13,8 @@ class Tickets extends Model
         'QR_code',
         'pdf',
     ];
+
+
+
+
 }
