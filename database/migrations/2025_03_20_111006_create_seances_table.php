@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('seances', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->datetimes('date_start');
+            $table->string('session');
+            $table->dateTime('date_start');
             $table->string('langue');
-            $table->foreign('film_id')->references('id')->on('films');
-            $table->foreign('salle_id')->references('id')->on('salles');
+
+            $table->unsignedBigInteger('film_id');
+            $table->unsignedBigInteger('salle_id');
+
+            $table->foreign('film_id')->references('id')->on('films')->onDelete('cascade');
+            $table->foreign('salle_id')->references('id')->on('salles')->onDelete('cascade');
+
             $table->timestamps();
 
         });
