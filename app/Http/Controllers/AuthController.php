@@ -43,7 +43,7 @@ public function register(Request $request)
     $validator = Validator::make($request->all(), [
         'FullName' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:6|confirmed',
+        'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
@@ -51,7 +51,7 @@ public function register(Request $request)
         }
 
         $user = User::create([
-        'name' => $request->name,
+        'FullName' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
         ]);
