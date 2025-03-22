@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Mockery\Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Repositories\UserRepositoryInterface;
@@ -16,6 +17,11 @@ class AuthController extends Controller
     public function __construct(UserRepositoryInterface $UserRepository)
     {
         return $this->Userrepository = $UserRepository;
+    }
+
+    public function index(){
+        $users=$this->Userrepository->all();
+        return response()->json($users);
     }
 
     /**
@@ -44,16 +50,18 @@ public function register(Request $request)
         'FullName' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:6',
-        ]);
+        'role_id' => 'required|exists:roles,id'
+    ]);
 
         if ($validator->fails()) {
         return response()->json($validator->errors(), 422);
         }
 
         $user = User::create([
-        'FullName' => $request->name,
+        'FullName' => $request->FullName,
         'email' => $request->email,
         'password' => Hash::make($request->password),
+        'role_id' => $request->role_id,
         ]);
 
         $token = JWTAuth::fromUser($user);
@@ -135,4 +143,34 @@ public function user()
 {
     return response()->json(['user' => auth()->user()], 200);
 }
+
+public function deletecompte(Request $request){
+    $user = $this->Userrepository->find($request->id);
+    if (!$user) {
+        return response()->json(['message' => 'Utilisateur introuvable'], 404);
+    }
+    try {
+        $this->Userrepository->delete($request->id);
+        return response()->json(['message' => 'Compte supprimé avec succès'], 200);
+
+    }catch (JWTException $e) {
+        return response()->json(['message' => 'Erreur interne du serveur'], 500);
+    }
+}
+
+public function updateProfile(Request $request){
+    $user = $this->Userrepository->find($request->id);
+    if (!$user) {
+        return response()->json(['message' => 'Utilisateur introuvable'], 404);
+    }
+    try {
+        $this->Userrepository->update($request->id,$request->all());
+        return response()->json(['message' => 'Compte update avec succès'], 200);
+    }catch (Exception $e){
+        return response()->json(['message' => 'Erreur interne du serveur'], 500);
+    }
+}
+
+
+
 }
