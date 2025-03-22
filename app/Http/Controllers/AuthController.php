@@ -159,13 +159,28 @@ public function deletecompte(Request $request){
 }
 
 public function updateProfile(Request $request){
+
+    $validator = Validator::make($request->all(), [
+        'FullName' => 'string|max:255',
+        'email' => 'email|unique:users,email,' . $request->id,
+        'password' => 'sometimes|min:6',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
     $user = $this->Userrepository->find($request->id);
+
     if (!$user) {
         return response()->json(['message' => 'Utilisateur introuvable'], 404);
     }
     try {
-        $this->Userrepository->update($request->id,$request->all());
-        return response()->json(['message' => 'Compte update avec succès'], 200);
+        $this->Userrepository->update($request->id, $request->only(['FullName', 'email', 'password']));
+        return response()->json([
+            'message' => 'Profil mis à jour avec succès',
+            'user' => $this->Userrepository->find($request->id)
+        ], 200);
     }catch (Exception $e){
         return response()->json(['message' => 'Erreur interne du serveur'], 500);
     }

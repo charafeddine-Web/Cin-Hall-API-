@@ -22,13 +22,13 @@ use App\Http\Controllers\AuthController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/users', [AuthController::class, 'index']);
 
 Route::middleware(['auth:api'])->group(function () {
-    Route::post('/users', [AuthController::class, 'index']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/user/{id}', [AuthController::class, 'deletecompte']);
-    Route::post('/user/{id}', [AuthController::class, 'updateProfile']);
+    Route::PUT('/user/{id}', [AuthController::class, 'updateProfile']);
 
 
     Route::get('/user', [AuthController::class, 'user']);

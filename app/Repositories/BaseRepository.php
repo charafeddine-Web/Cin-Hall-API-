@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 class BaseRepository implements BaseRepositoryInterface{
@@ -16,8 +17,11 @@ class BaseRepository implements BaseRepositoryInterface{
         return $this->model->create($data);
     }
     public function update($id, array $data){
-        return $this->model->update($id, $data);
-    }
+        $model = $this->model->find($id);
+        if (!$model) {
+            throw new Exception("Utilisateur introuvable");
+        }
+        return $model->update($data);    }
     public function delete($id){
         return $this->model->destroy($id);
     }
