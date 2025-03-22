@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->text('qr_code');
+            $table->text('pdf');
             $table->timestamps();
         });
     }

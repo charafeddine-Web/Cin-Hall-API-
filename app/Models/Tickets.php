@@ -14,7 +14,10 @@ class Tickets extends Model
         'pdf',
     ];
 
-
+    public function paiement()
+    {
+        return $this->hasOne(Paiements::class);
+    }
 
 
 }

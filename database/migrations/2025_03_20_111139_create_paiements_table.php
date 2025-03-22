@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('paiements', function (Blueprint $table) {
             $table->id();
+            $table->float('montant');
+            $table->enum('status', ['payé', 'en attente', 'annulé'])->default('en attente');
             $table->foreignId('reservation_id')->constrained('reservations');
             $table->foreignId('siege_id')->constrained('sieges');
+            $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
