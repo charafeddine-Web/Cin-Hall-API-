@@ -35,9 +35,12 @@ class SeanceController extends Controller
      *     @OA\Response(response=500, description="Erreur serveur")
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->seanceRepository->all(), Response::HTTP_OK);
+        $type = $request->query('type');
+        $seances = $this->seanceRepository->getAllFiltered($type);
+
+        return response()->json($seances, Response::HTTP_OK);
     }
 
     /**
@@ -48,10 +51,11 @@ class SeanceController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"date", "heure", "type_séance", "salle_id"},
-     *             @OA\Property(property="date", type="string", format="date"),
-     *             @OA\Property(property="heure", type="string", format="time"),
-     *             @OA\Property(property="type_séance", type="string"),
+     *             required={"session", "date_start", "langue", "film_id", "salle_id"},
+     *             @OA\Property(property="session", type="string"),
+     *             @OA\Property(property="date_start", type="string", format="date-time"),
+     *             @OA\Property(property="langue", type="string"),
+     *             @OA\Property(property="film_id", type="integer"),
      *             @OA\Property(property="salle_id", type="integer")
      *         )
      *     ),
@@ -63,9 +67,10 @@ class SeanceController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'date' => 'required|date',
-            'heure' => 'required|date_format:H:i',
-            'type_séance' => 'required|string',
+            'session' => 'required|string',
+            'date_start' => 'required|date',
+            'langue' => 'required|string',
+            'film_id' => 'required|integer|exists:filmes,id',
             'salle_id' => 'required|integer|exists:salles,id',
         ]);
 
@@ -110,9 +115,10 @@ class SeanceController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="date", type="string", format="date"),
-     *             @OA\Property(property="heure", type="string", format="time"),
-     *             @OA\Property(property="type_séance", type="string"),
+     *             @OA\Property(property="session", type="string"),
+     *             @OA\Property(property="date_start", type="string", format="date-time"),
+     *             @OA\Property(property="langue", type="string"),
+     *             @OA\Property(property="film_id", type="integer"),
      *             @OA\Property(property="salle_id", type="integer")
      *         )
      *     ),
@@ -125,9 +131,10 @@ class SeanceController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'date' => 'sometimes|date',
-            'heure' => 'sometimes|date_format:H:i',
-            'type_séance' => 'sometimes|string',
+            'session' => 'sometimes|string',
+            'date_start' => 'sometimes|date',
+            'langue' => 'sometimes|string',
+            'film_id' => 'sometimes|integer|exists:filmes,id',
             'salle_id' => 'sometimes|integer|exists:salles,id',
         ]);
 
