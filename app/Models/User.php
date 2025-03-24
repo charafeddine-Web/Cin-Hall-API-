@@ -50,7 +50,7 @@ class User extends Authenticatable  implements JWTSubject
     public function seances(){
         return $this->belongsToMany(Seances::class,'reservations');
     }
-    public function roles(){
+    public function role(){
         return $this->belongsTo(roles::class);
     }
 
@@ -62,6 +62,11 @@ class User extends Authenticatable  implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+    public function hasPermission($permission)
+    {
+        $permissions = explode(',', $this->role->permissions ?? '');
+        return in_array($permission, $permissions);
     }
 
 

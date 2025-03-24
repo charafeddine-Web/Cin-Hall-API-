@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\FilmController;
+use App\Http\Controllers\SalleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -32,4 +34,21 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     Route::get('/user', [AuthController::class, 'user']);
+
+
+    //fillms
+    Route::get('films', [FilmController::class, 'index']);
+    Route::get('films/{id}', [FilmController::class, 'show']);
+    Route::post('films', [FilmController::class, 'store']);
+    Route::put('films/{id}', [FilmController::class, 'update']);
+    Route::delete('films/{id}', [FilmController::class, 'destroy']);
+
+    //Salles
+
+    Route::get('salles', [SalleController::class, 'index']);
+    Route::get('salles/{id}', [SalleController::class, 'show']);
+    Route::post('salles', [SalleController::class, 'store']);
+    Route::put('salles/{id}', [SalleController::class, 'update']);
+    Route::delete('salles/{id}', [SalleController::class, 'destroy']);
+
 });

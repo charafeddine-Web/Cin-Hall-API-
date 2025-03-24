@@ -13,9 +13,21 @@ class CheckPermission
     {
         $user = Auth::user();
 
-        if (!$user || !$user->role || !in_array($permission, explode(',', $user->role->permissions))) {
-            return response()->json(['message' => 'Accès refusé. Permission manquante.'], Response::HTTP_FORBIDDEN);
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur non authentifié.'], Response::HTTP_UNAUTHORIZED);
         }
+
+        if (!$user->role) {
+            return response()->json(['message' => 'Aucun rôle assigné à cet utilisateur.'], Response::HTTP_FORBIDDEN);
+        }
+
+        $permissions = is_array($user->role->permissions) ? $user->role->permissions : explode(',', $user->role->permissions ?? '');
+
+
+        if (!in_array($permission, $permissions)) {
+            return response()->json(['message' => "Accès refusé. Permission '$permission' manquante."], Response::HTTP_FORBIDDEN);
+        }
+
 
         return $next($request);
     }

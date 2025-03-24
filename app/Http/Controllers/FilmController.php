@@ -20,6 +20,11 @@ class FilmController extends Controller
     public function __construct(FilmRepositoryInterface $filmRepository)
     {
         $this->filmRepository = $filmRepository;
+
+        $this->middleware('permission:view_films')->only(['index', 'show']);
+        $this->middleware('permission:create_film')->only(['store']);
+        $this->middleware('permission:edit_film')->only(['update']);
+        $this->middleware('permission:delete_film')->only(['destroy']);
     }
 
     /**
@@ -33,7 +38,7 @@ class FilmController extends Controller
      */
     public function index()
     {
-        return response()->json($this->filmRepository->getAll(), Response::HTTP_OK);
+        return response()->json($this->filmRepository->all(), Response::HTTP_OK);
     }
 
     /**
@@ -89,7 +94,7 @@ class FilmController extends Controller
      */
     public function show($id)
     {
-        $film = $this->filmRepository->findById($id);
+        $film = $this->filmRepository->find($id);
         if (!$film) {
             return response()->json(['message' => 'Film non trouvé'], Response::HTTP_NOT_FOUND);
         }
