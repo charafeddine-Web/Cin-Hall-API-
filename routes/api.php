@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FilmController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SalleController;
 use App\Http\Controllers\SeanceController;
 use App\Http\Controllers\SeatController;
@@ -65,5 +66,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('seats', [SeatController::class, 'store']);
     Route::put('seats/{id}', [SeatController::class, 'update']);
     Route::delete('seats/{id}', [SeatController::class, 'destroy']);
+
+    //Reservations
+    Route::get('reservations', [ReservationController::class, 'index']);
+    Route::get('reservations/{id}', [ReservationController::class, 'show']);
+    Route::post('reservations', [ReservationController::class, 'store']);
+    Route::put('reservations/{id}', [ReservationController::class, 'update']);
+    Route::delete('reservations/{id}', [ReservationController::class, 'destroy']);
 
 });
