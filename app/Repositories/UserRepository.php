@@ -2,8 +2,9 @@
 
 namespace App\Repositories;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+
 class UserRepository extends  BaseRepository implements UserRepositoryInterface {
 
     public function __construct(User $user){

@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use App\Repositories\Interfaces\BaseRepositoryInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
