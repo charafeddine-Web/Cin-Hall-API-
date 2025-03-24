@@ -3,6 +3,7 @@
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\SalleController;
 use App\Http\Controllers\SeanceController;
+use App\Http\Controllers\SeatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -58,5 +59,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('seances/{id}', [SeanceController::class, 'update']);
     Route::delete('seances/{id}', [SeanceController::class, 'destroy']);
 
+    //Seat
+    Route::get('seats', [SeatController::class, 'index']);
+    Route::get('seats/{id}', [SeatController::class, 'show']);
+    Route::post('seats', [SeatController::class, 'store']);
+    Route::put('seats/{id}', [SeatController::class, 'update']);
+    Route::delete('seats/{id}', [SeatController::class, 'destroy']);
 
 });
