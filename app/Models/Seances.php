@@ -10,9 +10,11 @@ class Seances extends Model
     use HasFactory;
 
     protected $fillable=[
+        'session',
+        'date_start',
         'type',
-        'date_heure',
-        'langue',
+        'film_id',
+        'salle_id',
     ];
 
     public function users()
