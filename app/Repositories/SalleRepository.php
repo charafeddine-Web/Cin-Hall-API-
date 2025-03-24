@@ -7,7 +7,7 @@ use App\Models\Salles;
 use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\SalleRepositoryInterface;
 
-class salleRepository extends BaseRepository implements SalleRepositoryInterface
+class SalleRepository extends BaseRepository implements SalleRepositoryInterface
 {
     public function __construct(Salles $salles)
     {

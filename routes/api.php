@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\SalleController;
+use App\Http\Controllers\SeanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -44,11 +45,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('films/{id}', [FilmController::class, 'destroy']);
 
     //Salles
-
     Route::get('salles', [SalleController::class, 'index']);
     Route::get('salles/{id}', [SalleController::class, 'show']);
     Route::post('salles', [SalleController::class, 'store']);
     Route::put('salles/{id}', [SalleController::class, 'update']);
     Route::delete('salles/{id}', [SalleController::class, 'destroy']);
+
+    //Seance
+    Route::get('seances', [SeanceController::class, 'index']);
+    Route::get('seances/{id}', [SeanceController::class, 'show']);
+    Route::post('seances', [SeanceController::class, 'store']);
+    Route::put('seances/{id}', [SeanceController::class, 'update']);
+    Route::delete('seances/{id}', [SeanceController::class, 'destroy']);
+
 
 });
