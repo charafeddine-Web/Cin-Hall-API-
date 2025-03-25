@@ -59,6 +59,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('seances', [SeanceController::class, 'store']);
     Route::put('seances/{id}', [SeanceController::class, 'update']);
     Route::delete('seances/{id}', [SeanceController::class, 'destroy']);
+    Route::get('/seances', [SeanceController::class, 'getSeancesByType']);
 
     //Seat
     Route::get('seats', [SeatController::class, 'index']);

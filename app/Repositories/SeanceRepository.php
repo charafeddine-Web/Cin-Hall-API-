@@ -16,29 +16,14 @@ class SeanceRepository extends BaseRepository implements SeanceRepositoryInterfa
         parent::__construct($seances);
     }
 
-
-
     /**
      * Get all sessions filtered by type (VIP, Normal, etc.)
      *
      * @param string|null $type
      * @return Collection
      */
-    public function getAllFiltered($type = null): Collection
+    public function getByType(string $type): Collection
     {
-        $query = Seances::query();
-        if ($type) {
-            $query->where('session', $type);
-        }
-        if (request()->has('langue')) {
-            $query->where('langue', request()->get('langue'));
-        }
-        if (request()->has('film_id')) {
-            $query->where('film_id', request()->get('film_id'));
-        }
-        if (request()->has('salle_id')) {
-            $query->where('salle_id', request()->get('salle_id'));
-        }
-        return $query->get();
+        return Seances::where('type', $type)->get();
     }
 }
