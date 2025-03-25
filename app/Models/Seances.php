@@ -12,9 +12,9 @@ class Seances extends Model
     protected $fillable=[
         'session',
         'date_start',
-        'type',
-        'film_id',
+        'langue',
         'salle_id',
+        'film_id',
     ];
 
     public function users()

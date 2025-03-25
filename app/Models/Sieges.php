@@ -11,7 +11,9 @@ class Sieges extends Model
 
     protected $fillable=[
         'numero',
+        'type',
         'status',
+        'salle_id'
     ];
 
 

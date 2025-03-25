@@ -63,10 +63,10 @@ class SeatController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'place_number' => 'required|integer',
-            'row' => 'required|string',
+            'numero' => 'required|integer',
+            'type' => 'required|string',
             'status' => 'required|string|in:available,reserved,occupied',
-            'session_id' => 'required|integer|exists:sessions,id',
+            'salle_id' => 'required|integer|exists:salles,id',
         ]);
 
         return response()->json($this->seatRepository->create($data), Response::HTTP_CREATED);

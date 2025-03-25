@@ -7,7 +7,6 @@ use App\Models\Salles;
 use App\Models\Seances;
 use App\Models\Sieges;
 use App\Repositories\BaseRepository;
-use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\SeanceRepositoryInterface;
 use App\Repositories\Interfaces\SeatRepositoryInterface;
 
