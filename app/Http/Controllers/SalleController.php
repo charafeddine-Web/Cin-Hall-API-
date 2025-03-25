@@ -49,9 +49,9 @@ class SalleController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"nom", "capacite", "type"},
+     *             required={"nom", "nbr_places", "type"},
      *             @OA\Property(property="nom", type="string"),
-     *             @OA\Property(property="capacite", type="integer"),
+     *             @OA\Property(property="nbr_places", type="integer"),
      *             @OA\Property(property="type", type="string", enum={"Normal", "VIP"})
      *         )
      *     ),
@@ -64,8 +64,7 @@ class SalleController extends Controller
     {
         $data = $request->validate([
             'nom' => 'required|string|max:255',
-            'capacite' => 'required|integer',
-            'type' => 'required|string|in:Normal,VIP',
+            'nbr_places' => 'required|integer',
         ]);
 
         return response()->json($this->salleRepository->create($data), Response::HTTP_CREATED);
@@ -110,7 +109,7 @@ class SalleController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="nom", type="string"),
-     *             @OA\Property(property="capacite", type="integer"),
+     *             @OA\Property(property="nbr_places", type="integer"),
      *             @OA\Property(property="type", type="string", enum={"Normal", "VIP"})
      *         )
      *     ),
@@ -124,10 +123,8 @@ class SalleController extends Controller
     {
         $data = $request->validate([
             'nom' => 'sometimes|string|max:255',
-            'capacite' => 'sometimes|integer',
-            'type' => 'sometimes|string|in:Normal,VIP',
+            'nbr_places' => 'sometimes|integer',
         ]);
-
         $salle = $this->salleRepository->update($id, $data);
         if (!$salle) {
             return response()->json(['message' => 'Salle non trouvée'], Response::HTTP_NOT_FOUND);

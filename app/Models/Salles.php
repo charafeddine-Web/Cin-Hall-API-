@@ -11,8 +11,8 @@ class Salles extends Model
 
 
     protected $fillable = [
-        'name',
-        'type',
+        'nom',
+        'nbr_places',
     ];
 
 
