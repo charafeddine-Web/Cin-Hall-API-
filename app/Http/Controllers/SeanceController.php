@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\SeanceRepositoryInterface;
 use Illuminate\Http\Response;
@@ -169,4 +170,13 @@ class SeanceController extends Controller
         }
         return response()->json(['message' => 'Séance supprimée'], Response::HTTP_OK);
     }
+
+    public function getSeancesByType(Request $request): JsonResponse
+    {
+        $request->validate(['type' => 'required|in:Normale,VIP']);
+        $seances = $this->seanceRepository->getByType($request->type);
+
+        return response()->json($seances);
+    }
+
 }
