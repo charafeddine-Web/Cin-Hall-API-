@@ -9,14 +9,15 @@ class Tickets extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
-        'QR_code',
-        'pdf',
+    protected $fillable = [
+        'paiement_id',
+        'qr_code',
+        'pdf_path'
     ];
 
     public function paiement()
     {
-        return $this->hasOne(Paiements::class);
+        return $this->belongsTo(Paiements::class);
     }
 
 
