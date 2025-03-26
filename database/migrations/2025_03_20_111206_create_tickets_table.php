@@ -8,7 +8,7 @@ return new class extends Migration {
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('paiement_id')->constrained('paiements')->onDelete('cascade');
+            $table->foreignId('paiement_id')->nullable()->constrained('paiements')->onDelete('cascade');
             $table->string('qr_code')->nullable();
             $table->string('pdf_path')->nullable();
             $table->timestamps();

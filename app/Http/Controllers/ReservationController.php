@@ -6,10 +6,12 @@ use App\Models\Paiements;
 use App\Models\Reservations;
 use App\Models\Seances;
 use App\Models\Sieges;
+use App\Models\Tickets;
 use Illuminate\Http\Request;
 use App\Repositories\Interfaces\ReservationRepositoryInterface;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * @OA\Tag(
@@ -68,69 +70,64 @@ class ReservationController extends Controller
 
     public function store(Request $request)
     {
-        // Validate request
         $data = $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'seance_id' => 'required|integer|exists:seances,id',
             'status' => 'required',
-            'seat_ids' => 'required|array|min:2', // Ensure two seats are provided
-            'seat_ids.*' => 'integer|exists:sieges,id', // Validate each seat ID
+            'seat_ids' => 'required|array|min:2',
+            'seat_ids.*' => 'integer|exists:sieges,id',
             'montant' => 'required|numeric',
         ]);
 
-        // Fetch the session
         $seance = Seances::find($data['seance_id']);
         if (!$seance) {
             return response()->json(['message' => 'Séance non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        DB::beginTransaction(); // Start transaction
-
+        DB::beginTransaction();
         try {
-            // Check if the session is VIP
             if ($seance->type === 'VIP') {
                 $seats = Sieges::whereIn('id', $data['seat_ids'])->get();
 
-                // Ensure exactly two seats are provided
                 if ($seats->count() !== 2) {
                     throw new \Exception('Vous devez réserver deux sièges pour une séance VIP.');
                 }
 
-                // Ensure the two seats belong to the same couple
                 if ($seats[0]->couple_seat_id !== $seats[1]->id || $seats[1]->couple_seat_id !== $seats[0]->id) {
                     throw new \Exception('Les sièges doivent être réservés en couple pour une séance VIP.');
                 }
             }
-
-            // Create the reservation
             $reservation = Reservations::create([
                 'user_id' => $data['user_id'],
                 'seance_id' => $data['seance_id'],
                 'status' => $data['status'],
             ]);
-
-            // Insert payments and update seat statuses
             foreach ($data['seat_ids'] as $seatId) {
-                // Insert into paiements table
-                Paiements::create([
+                $paiment=Paiements::create([
                     'reservation_id' => $reservation->id,
                     'siege_id' => $seatId,
                     'montant' => $data['montant'],
                     'status' => 'en attente',
                 ]);
-
-                // Update seat status to "reserved"
                 Sieges::where('id', $seatId)->update(['status' => 'reserved']);
             }
+            $ticket = Tickets::create([
+                'paiement_id' => $paiment->id,
+                'qr_code' => Str::random(10),
+                'status' => 'généré',
+            ]);
+            DB::commit();
 
-            DB::commit(); // Commit transaction
-
-            return response()->json($reservation, Response::HTTP_CREATED);
+            return response()->json([
+                'reservation' => $reservation,
+                'ticket' => $ticket
+            ], Response::HTTP_CREATED);
         } catch (\Exception $e) {
-            DB::rollBack(); // Rollback transaction in case of error
+            DB::rollBack();
             return response()->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
+
 
 
 
