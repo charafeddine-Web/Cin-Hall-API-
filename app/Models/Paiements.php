@@ -10,8 +10,6 @@
         use HasFactory;
 
         protected $fillable=[
-            'user_id',
-            'seance_id',
             'montant',
             'status',
             'reservation_id',
