@@ -10,11 +10,13 @@ class Reservations extends Model
     use HasFactory;
 
     protected $fillable=[
-        'status',
+        "user_id",
+        "seance_id",
+        'status'
     ];
 
 
     public function sieges(){
-        return $this->belongsToMany(Sieges::class,'paiements');
+        return $this->belongsToMany(Sieges::class, 'paiements', 'reservation_id', 'siege_id');
     }
 }

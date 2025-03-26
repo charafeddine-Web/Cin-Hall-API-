@@ -10,9 +10,12 @@
         use HasFactory;
 
         protected $fillable=[
+            'user_id',
+            'seance_id',
             'montant',
             'status',
-            'ticket_id',
+            'reservation_id',
+            'siege_id'
         ];
 
         public function ticket()

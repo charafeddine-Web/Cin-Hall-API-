@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->float('montant');
             $table->enum('status', ['payé', 'en attente', 'annulé'])->default('en attente');
-            $table->foreignId('reservation_id')->constrained('reservations');
-            $table->foreignId('siege_id')->constrained('sieges');
-            $table->foreignId('ticket_id')->constrained()->onDelete('cascade');
+            $table->foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
+            $table->foreignId('siege_id')->constrained('sieges')->onDelete('cascade');
+            $table->foreignId('ticket_id')->constrained('tickets')->onDelete('cascade');
             $table->timestamps();
         });
     }
