@@ -12,7 +12,11 @@ class Reservations extends Model
     protected $fillable=[
         "user_id",
         "seance_id",
-        'status'
+        'status',
+        'expires_at'
+    ];
+    protected $casts = [
+        'expires_at' => 'datetime',
     ];
 
 

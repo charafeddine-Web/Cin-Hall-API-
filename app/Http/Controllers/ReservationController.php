@@ -101,6 +101,8 @@ class ReservationController extends Controller
                 'user_id' => $data['user_id'],
                 'seance_id' => $data['seance_id'],
                 'status' => $data['status'],
+                'expires_at' => now()->addMinutes(15),
+
             ]);
             foreach ($data['seat_ids'] as $seatId) {
                 $paiment=Paiements::create([
