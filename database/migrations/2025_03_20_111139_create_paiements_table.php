@@ -11,7 +11,6 @@ return new class extends Migration {
             $table->foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
             $table->foreignId('siege_id')->constrained('sieges')->onDelete('cascade');
             $table->decimal('montant', 10, 2);
-            $table->enum('status', ['en attente', 'payé', 'annulé'])->default('en attente');
             $table->timestamps();
         });
     }

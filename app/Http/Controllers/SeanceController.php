@@ -36,10 +36,10 @@ class SeanceController extends Controller
      *     @OA\Response(response=500, description="Erreur serveur")
      * )
      */
-    public function index(Request $request)
+    public function index()
     {
-        $type = $request->query('type');
-        $seances = $this->seanceRepository->getAllFiltered($type);
+//        $type = $request->query('type');
+        $seances = $this->seanceRepository->all();
 
         return response()->json($seances, Response::HTTP_OK);
     }
@@ -171,12 +171,15 @@ class SeanceController extends Controller
         return response()->json(['message' => 'Séance supprimée'], Response::HTTP_OK);
     }
 
-    public function getSeancesByType(Request $request): JsonResponse
+    public function getSeancesByType(string $type): JsonResponse
     {
-        $request->validate(['type' => 'required|in:Normale,VIP']);
-        $seances = $this->seanceRepository->getByType($request->type);
+        if (!in_array($type, ['Normale', 'VIP'])) {
+            return response()->json(['error' => 'Invalid type. Allowed: Normale, VIP'], 400);
+        }
+        $seances = $this->seanceRepository->getByType($type);
 
         return response()->json($seances);
     }
+
 
 }
