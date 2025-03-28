@@ -11,7 +11,6 @@
 
         protected $fillable=[
             'montant',
-            'status',
             'reservation_id',
             'siege_id'
         ];
