@@ -58,7 +58,7 @@ Compte Stripe/PayPal (pour paiements)
 
 Clonez le dépôt
 
-bashCopiergit clone https://github.com/charafeddine-Web/cinehall.git
+bashCopiergit clone https://github.com/charafeddine-Web/Cin-Hall-API-
 cd cinehall
 
 Installez les dépendances
