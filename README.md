@@ -1,66 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+CinéHall - Plateforme de Réservation de Cinéma
+📽️ À Propos du Projet
+CinéHall est une application web moderne permettant la réservation de billets de cinéma en ligne, offrant une expérience utilisateur fluide et intuitive.
+🚀 Fonctionnalités Principales
+Gestion des Utilisateurs
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Création et authentification de compte
+Authentification JWT
+Gestion complète du profil utilisateur
 
-## About Laravel
+Gestion des Films et Séances
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Informations détaillées sur les films
+Création et gestion des séances
+Filtrage avancé des séances
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Gestion des Salles et Sièges
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Configuration flexible des salles
+Options de sièges VIP et couples
+Gestion dynamique des sièges en temps réel
 
-## Learning Laravel
+Réservation et Paiement
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Réservation de sièges simplifiée
+Intégration de paiement en ligne (Stripe/PayPal)
+Expiration automatique des réservations non payées
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Billets Électroniques
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Génération de billets avec QR Code
+Téléchargement en PDF
 
-## Laravel Sponsors
+Dashboard Administrateur
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Vue d'ensemble des statistiques
+Analyse des performances
+Gestion des utilisateurs et des films
 
-### Premium Partners
+🛠 Technologies Utilisées
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Backend: Laravel (PHP)
+API: RESTful API
+Base de Données: PostgreSQL
+Authentification: JWT
+Tests: Postman
+Documentation API: Swagger/OpenAPI
 
-## Contributing
+📋 Prérequis
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+PHP 8.1+
+Composer
+PostgreSQL
+Laravel 9/10
+Compte Stripe/PayPal (pour paiements)
 
-## Code of Conduct
+🔧 Installation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Clonez le dépôt
 
-## Security Vulnerabilities
+bashCopiergit clone https://github.com/charafeddine-Web/cinehall.git
+cd cinehall
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Installez les dépendances
 
-## License
+bashCopiercomposer install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Configurez l'environnement
+
+bashCopiercp .env.example .env
+php artisan key:generate
+
+Configurez la base de données PostgreSQL
+
+bashCopier# Modifiez .env avec vos identifiants PostgreSQL
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=cinehall
+DB_USERNAME=votre_utilisateur
+DB_PASSWORD=votre_mot_de_passe
+
+Migrez et seedez la base de données
+
+bashCopierphp artisan migrate
+php artisan db:seed
+
+Lancez le serveur
+
+bashCopierphp artisan serve
+🧪 Tests
+
+Tests unitaires Laravel
+Collection de tests Postman disponible dans /tests/postman
+
+bashCopierphp artisan test
+📚 Documentation API
+La documentation complète de l'API est disponible via Swagger:
+
+URL: /api/documentation
+Format: OpenAPI Specification
+
+🔐 Authentification
+Authentification basée sur JWT avec support optionnel des connexions via réseaux sociaux.
+
+
+
+🤝 Contribution
+
+Forkez le projet
+Créez votre branche de fonctionnalité (git checkout -b feature/AmazingFeature)
+Commitez vos modifications (git commit -m 'Add some AmazingFeature')
+Poussez sur la branche (git push origin feature/AmazingFeature)
+Ouvrez une Pull Request
+
+📄 Licence
+Distribué sous licence MIT. Voir LICENSE pour plus d'informations.
+📧 Contact
+Tbibzat Charaf Eddine - charafeddinetbibzat.email@example.com
