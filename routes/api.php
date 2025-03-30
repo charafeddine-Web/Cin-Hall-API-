@@ -1,13 +1,16 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\FilmController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SalleController;
 use App\Http\Controllers\SeanceController;
-use App\Http\Controllers\SeatController;
+use App\Http\Controllers\TicketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\SiegeController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -23,56 +26,72 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-use App\Http\Controllers\AuthController;
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/users', [AuthController::class, 'index']);
 
-Route::middleware(['auth:api'])->group(function () {
-
+Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/user/{id}', [AuthController::class, 'deletecompte']);
-    Route::PUT('/user/{id}', [AuthController::class, 'updateProfile']);
+    Route::put('/profile/', [AuthController::class, 'updateProfile']);
+    Route::delete('/profile/', [AuthController::class, 'deleteAccount']);
+});
 
 
-    Route::get('/user', [AuthController::class, 'user']);
+//  Consultation des séances et films (disponible pour tout le monde)
+Route::get('/seances/{idfilm}', [SeanceController::class, 'getAllSeancesWithFilms']);
+Route::get('/seances/{type}', [SeanceController::class, 'showByType']);// avec query ?type=VIP
 
 
-    //fillms
-    Route::get('films', [FilmController::class, 'index']);
-    Route::get('films/{id}', [FilmController::class, 'show']);
-    Route::post('films', [FilmController::class, 'store']);
-    Route::put('films/{id}', [FilmController::class, 'update']);
-    Route::delete('films/{id}', [FilmController::class, 'destroy']);
+// Routes accessibles uniquement aux **administrateurs**
+Route::middleware(['auth:api', 'role:admin'])->group(function () {
+    Route::apiResource('films', FilmController::class);
+    Route::apiResource('salles', SalleController::class);
+    Route::apiResource('seances', SeanceController::class);
+    Route::apiResource('sieges', SiegeController::class);
 
-    //Salles
-    Route::get('salles', [SalleController::class, 'index']);
-    Route::get('salles/{id}', [SalleController::class, 'show']);
-    Route::post('salles', [SalleController::class, 'store']);
-    Route::put('salles/{id}', [SalleController::class, 'update']);
-    Route::delete('salles/{id}', [SalleController::class, 'destroy']);
+    // Méthodes personnalisées de reservation
+    Route::post('/reservations/{id}/confirm', [ReservationController::class, 'confirm']);
+    Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel']);
 
-    //Seance
-    Route::get('seances', [SeanceController::class, 'index']);
-    Route::get('seances/{id}', [SeanceController::class, 'show']);
-    Route::post('seances', [SeanceController::class, 'store']);
-    Route::put('seances/{id}', [SeanceController::class, 'update']);
-    Route::delete('seances/{id}', [SeanceController::class, 'destroy']);
-    Route::get('/seances/type/{type}', [SeanceController::class, 'getSeancesByType']);
-
-    //Seat
-    Route::get('seats', [SeatController::class, 'index']);
-    Route::get('seats/{id}', [SeatController::class, 'show']);
-    Route::post('seats', [SeatController::class, 'store']);
-    Route::put('seats/{id}', [SeatController::class, 'update']);
-    Route::delete('seats/{id}', [SeatController::class, 'destroy']);
-
-    //Reservations
-    Route::get('reservations', [ReservationController::class, 'index']);
-    Route::get('reservations/{id}', [ReservationController::class, 'show']);
-    Route::post('reservations', [ReservationController::class, 'store']);
-    Route::put('reservations/{id}', [ReservationController::class, 'update']);
-    Route::delete('reservations/{id}', [ReservationController::class, 'destroy']);
+    //statistique
+    Route::get('/admin/dashboard', [DashboardController::class, 'getDashboardStats']);
 
 });
+
+Route::middleware('auth:api')->group(function () {
+    Route::resource('reservations', ReservationController::class);
+    //paiment
+    Route::post('/payment', [PaymentController::class, 'createCheckoutSession'])->name('payment.create');
+    Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+    Route::post('/stripe/webhook', [PaymentController::class, 'handleWebhook']);
+});
+
+
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+//Quand tu ouvres le lien de paiement Stripe dans le navigateur, Laravel ne sait pas que tu es authentifié sur Postman. L'authentification est stockée dans une session ou via un token, mais quand Stripe redirige après le paiement, le navigateur ne transmet pas l'authentification.
+//
+//👉 Résultat : Laravel pense que tu n'es pas connecté et essaie de te rediriger vers /login, mais cette route n'existe pas.
+
+
+// genere pdf  test
+
+//use Barryvdh\DomPDF\Facade\Pdf;
+
+//Route::get('/generate-pdf', function () {
+//    $data = [
+//        'title' => 'Test PDF',
+//        'content' => 'This is a PDF generated from Laravel'
+//    ];
+//
+//    $pdf = PDF::loadView('pdf.template', $data);
+//    return $pdf->download('generated-file.pdf');
+//} ;
+
+
+//generer pdf ticket
+
+Route::get('/generate-ticket/{reservationId}', [TicketController::class, 'generateTicket']);
+
+
+

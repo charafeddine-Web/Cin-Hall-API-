@@ -2,28 +2,78 @@
 
 namespace App\Repositories;
 
-use App\Models\Filmes;
-use App\Models\Salles;
-use App\Models\Seances;
-use App\Repositories\BaseRepository;
-use App\Repositories\Interfaces\SeanceRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Film;
+use App\Models\Salle;
+use App\Models\Seance;
+use App\Repositories\Contracts\SeanceRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
-class SeanceRepository extends BaseRepository implements SeanceRepositoryInterface
+class SeanceRepository implements SeanceRepositoryInterface
 {
-    public function __construct(Seances $seances)
+    public function getAll()
     {
-        parent::__construct($seances);
+        return Seance::all();
     }
 
-    /**
-     * Get all sessions filtered by type (VIP, Normal, etc.)
-     *
-     * @param string|null $type
-     * @return Collection
-     */
-    public function getByType(string $type): Collection
+    public function findById($id)
+{
+    return Seance::find($id);
+}
+    public function getSeance($id)
     {
-        return Seances::where('type', $type)->get();
+        return Seance::find($id);
+    }
+    public function getSeancesByType($type){
+        $seances = DB::table('seances')
+             ->join('films', 'films.id', '=', 'seances.film_id')
+            ->where('seances.type_seance', $type)
+            ->get();
+        return $seances;
+
+    }
+
+//    public function create(array $data)
+//    {
+//        $film = Film::findOrFail($data['film_id']);
+//        return $film->salles()->attach($data['salle_id'], [
+//            'start_time' => $data['start_time'],
+//            'session' => $data['session'],
+//            'langue' => $data['langue']
+//        ]);
+//    }
+
+
+    public function create(array $data)
+    {
+        $film = Film::findOrFail($data['film_id']);
+        $salle = Salle::findOrFail($data['salle_id']);
+
+        // Ajouter une séance dans la table pivot
+        return $film->salles()->attach($salle->id, [
+            'start_time' => $data['start_time'],
+            'session' => $data['session'],
+            'langue' => $data['langue'],
+            'type_seance' => $data['type_seance'],
+            'prix' => $data['prix'],
+        ]);
+    }
+    public function update($id, array $data)
+    {
+        $seance = $this->findById($id);
+        $seance->update($data);
+        return $seance;
+    }
+
+    public function delete($id)
+    {
+        return Seance::destroy($id);
+    }
+
+    public function getAllSeancesWithFilms()
+    {
+       return DB::table('seances')
+           ->join('films', 'films.id', '=', 'seances.film_id')
+           ->join('salles', 'salles.id', '=', 'seances.salle_id')
+           ->get();
     }
 }

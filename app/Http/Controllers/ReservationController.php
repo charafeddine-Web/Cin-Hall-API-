@@ -1,261 +1,272 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Paiements;
-use App\Models\Reservations;
-use App\Models\Seances;
-use App\Models\Sieges;
-use App\Models\Tickets;
+use App\Models\Reservation;
+use App\Models\User;
+use App\Services\ReservationService;
 use Illuminate\Http\Request;
-use App\Repositories\Interfaces\ReservationRepositoryInterface;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-/**
- * @OA\Tag(
- *     name="Réservations",
- *     description="Gestion des réservations"
- * )
- */
 class ReservationController extends Controller
 {
-    protected $reservationRepository;
+    protected $reservationService;
 
-    public function __construct(ReservationRepositoryInterface $reservationRepository)
+    public function __construct(ReservationService $reservationService)
     {
-        $this->reservationRepository = $reservationRepository;
-
-        $this->middleware('permission:view_reservations')->only(['index', 'show']);
-        $this->middleware('permission:create_reservation')->only(['store']);
-        $this->middleware('permission:edit_reservation')->only(['update']);
-        $this->middleware('permission:delete_reservation')->only(['destroy']);
+        $this->reservationService = $reservationService;
+        $this->middleware('auth:api');
     }
-
     /**
      * @OA\Get(
      *     path="/api/reservations",
-     *     summary="Liste toutes les réservations",
+     *     summary="Obtenir toutes les réservations",
+     *     description="Récupère toutes les réservations de l'utilisateur authentifié.",
      *     tags={"Réservations"},
-     *     @OA\Response(response=200, description="Liste des réservations"),
-     *     @OA\Response(response=500, description="Erreur serveur")
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des réservations de l'utilisateur",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=3),
+     *                 @OA\Property(property="seance_id", type="integer", example=2),
+     *                 @OA\Property(property="siege_id", type="integer", example=15),
+     *                 @OA\Property(property="status", type="string", example="pending"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-03-28 14:00:00"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-03-28 14:00:00")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié"
+     *     )
      * )
      */
     public function index()
     {
-        return response()->json($this->reservationRepository->all(), Response::HTTP_OK);
+        $userId = Auth::id();
+        $reservations = Reservation::where('user_id', $userId)
+            ->with('seance', 'siege') // Charger les relations de la séance et du siège
+            ->get();
+
+        // Vérifier si l'utilisateur a des réservations
+        if ($reservations->isEmpty()) {
+            return response()->json(['message' => 'Aucune réservation trouvée.'], 404);
+        }
+
+        return response()->json($reservations);
     }
 
     /**
      * @OA\Post(
      *     path="/api/reservations",
-     *     summary="Create a new reservation",
-     *     description="This endpoint creates a reservation for a user. If the session is VIP, it requires two seats to be reserved in a couple.",
-     *     tags={"Reservations"},
+     *     summary="Créer une nouvelle réservation",
+     *     description="Ajoute une réservation pour l'utilisateur authentifié.",
+     *     tags={"Réservations"},
+     *     security={{"bearerAuth": {}}},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Reservation details",
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 required={"user_id", "seance_id", "status", "seat_ids", "montant"},
-     *                 @OA\Property(property="user_id", type="integer", description="User ID who is making the reservation"),
-     *                 @OA\Property(property="seance_id", type="integer", description="Session ID for the reservation"),
-     *                 @OA\Property(property="status", type="string", description="Reservation status"),
-     *                 @OA\Property(property="seat_ids", type="array", @OA\Items(type="integer"), description="Array of seat IDs"),
-     *                 @OA\Property(property="montant", type="number", format="float", description="Total amount for the reservation"),
-     *             )
+     *         @OA\JsonContent(
+     *             required={"seance_id", "siege_id"},
+     *             @OA\Property(property="seance_id", type="integer", example=2, description="ID de la séance à réserver"),
+     *             @OA\Property(property="siege_id", type="integer", example=15, description="ID du siège sélectionné")
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Reservation successfully created",
+     *         description="Réservation créée avec succès",
      *         @OA\JsonContent(
-     *             @OA\Property(property="reservation", type="object", ref="#/components/schemas/Reservation"),
-     *             @OA\Property(property="ticket", type="object", ref="#/components/schemas/Ticket")
+     *             type="object",
+     *             @OA\Property(property="reservation", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=3),
+     *                 @OA\Property(property="seance_id", type="integer", example=2),
+     *                 @OA\Property(property="siege_id", type="integer", example=15),
+     *                 @OA\Property(property="status", type="string", example="pending")
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=400,
-     *         description="Bad request, invalid data",
+     *         description="Erreur de validation",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", description="Error message")
+     *             @OA\Property(property="message", type="string", example="Le siège est déjà réservé.")
      *         )
      *     ),
      *     @OA\Response(
-     *         response=404,
-     *         description="Session not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", description="Error message")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error, failed to create reservation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="error", type="string", description="Error message")
-     *         )
+     *         response=401,
+     *         description="Non authentifié"
      *     )
      * )
      */
+    // Pour créer une réservation
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-            'seance_id' => 'required|integer|exists:seances,id',
-            'status' => 'required',
-            'seat_ids' => 'required|array|min:1',
-            'seat_ids.*' => 'integer|exists:sieges,id',
-            'montant' => 'required|numeric',
-        ]);
+        $userId = Auth::id();
+        $data = $request->all();
+        $data['user_id'] = $userId;
 
-        $seance = Seances::find($data['seance_id']);
-        if (!$seance) {
-            return response()->json(['message' => 'Séance non trouvée'], Response::HTTP_NOT_FOUND);
-        }
-
-        DB::beginTransaction();
-        try {
-            if ($seance->type === 'VIP') {
-                $seats = Sieges::whereIn('id', $data['seat_ids'])->get();
-
-                if ($seats->count() < 2) {
-                    return response()->json(['message' => 'Pour une séance VIP, nous vous recommandons de réserver deux sièges.'], Response::HTTP_BAD_REQUEST);
-                }
-
-                if ($seats[0]->couple_seat_id !== $seats[1]->id || $seats[1]->couple_seat_id !== $seats[0]->id) {
-                    throw new \Exception('Les sièges doivent être réservés en couple pour une séance VIP.');
-                }
-            }
-            $reservation = Reservations::create([
-                'user_id' => $data['user_id'],
-                'seance_id' => $data['seance_id'],
-                'status' => $data['status'],
-                'expires_at' => now()->addMinutes(15),
-                'seat_ids' => json_encode($data['seat_ids']),  // Store the seat_ids in the reservation
-
-            ]);
-            if ($reservation->status === 'confirmée') {
-                foreach ($data['seat_ids'] as $seatId) {
-                    $payment = Paiements::create([
-                        'reservation_id' => $reservation->id,
-                        'siege_id' => $seatId,
-                        'montant' => $data['montant'],
-                    ]);
-
-                    // Mark seats as reserved
-                    Sieges::where('id', $seatId)->update(['status' => 'reserved']);
-                }
-
-                // Create ticket based on the payment (for the last one created)
-                $ticket = Tickets::create([
-                    'paiement_id' => $payment->id,
-                    'qr_code' => Str::random(10),
-                ]);
-            }
-            DB::commit();
-
-            return response()->json([
-                'reservation' => $reservation,
-                'ticket' => $ticket ?? null  // If no ticket created, return null
-            ], Response::HTTP_CREATED);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
-        }
+        return $this->reservationService->createReservation($data);
     }
-
-
-
-
-    /**
-     * @OA\Get(
-     *     path="/api/reservations/{id}",
-     *     summary="Afficher une réservation spécifique",
-     *     tags={"Réservations"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(response=200, description="Réservation trouvée"),
-     *     @OA\Response(response=404, description="Réservation non trouvée")
-     * )
-     */
-    public function show($id)
-    {
-        $reservation = $this->reservationRepository->find($id);
-        if (!$reservation) {
-            return response()->json(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
-        }
-        return response()->json($reservation, Response::HTTP_OK);
-    }
-
     /**
      * @OA\Put(
      *     path="/api/reservations/{id}",
      *     summary="Mettre à jour une réservation",
+     *     description="Mise à jour des informations d'une réservation existante.",
      *     tags={"Réservations"},
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         @OA\Schema(type="integer")
+     *         description="ID de la réservation à mettre à jour",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="user_id", type="integer"),
-     *             @OA\Property(property="seat_id", type="integer"),
-     *             @OA\Property(property="reservation_date", type="string", format="date-time")
+     *             required={"user_id", "siege_id", "seance_id", "status"},
+     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="siege_id", type="integer", example=10),
+     *             @OA\Property(property="seance_id", type="integer", example=3),
+     *             @OA\Property(property="status", type="string", example="confirmed")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Réservation mise à jour"),
-     *     @OA\Response(response=400, description="Données invalides"),
-     *     @OA\Response(response=404, description="Réservation non trouvée"),
-     *     @OA\Response(response=500, description="Erreur serveur")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Réservation mise à jour avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="siege_id", type="integer", example=10),
+     *             @OA\Property(property="seance_id", type="integer", example=3),
+     *             @OA\Property(property="status", type="string", example="pending")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Données invalides"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Réservation non trouvée"
+     *     )
      * )
      */
-    public function update(Request $request, $id)
+    public function update(Request $request  , $id)
     {
-        $data = $request->validate([
-            'user_id' => 'sometimes|integer|exists:users,id',
-            'seance_id' => 'sometimes|integer|exists:seats,id',
-            'status' => 'sometimes',
-        ]);
-
-        $reservation = $this->reservationRepository->update($id, $data);
-        if (!$reservation) {
-            return response()->json(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
-        }
-        return response()->json($reservation, Response::HTTP_OK);
+        $data = $request->all();
+        $data['user_id'] = auth()->id();
+      //  return response()->json($data);
+        return $this->reservationService->updateResevation($data , $id);
     }
 
     /**
-     * @OA\Delete(
-     *     path="/api/reservations/{id}",
-     *     summary="Supprimer une réservation",
+     * @OA\Post(
+     *     path="/api/reservations/{id}/confirm",
+     *     summary="Confirmer une réservation",
+     *     description="Confirme une réservation en attente.",
      *     tags={"Réservations"},
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         @OA\Schema(type="integer")
+     *         description="ID de la réservation à confirmer",
+     *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\Response(response=200, description="Réservation supprimée"),
-     *     @OA\Response(response=404, description="Réservation non trouvée"),
-     *     @OA\Response(response=500, description="Erreur serveur")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Réservation confirmée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Réservation confirmée."),
+     *             @OA\Property(property="reservation", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=3),
+     *                 @OA\Property(property="status", type="string", example="confirmed"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-03-28 14:00:00")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Impossible de confirmer la réservation"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Réservation non trouvée"
+     *     )
      * )
      */
-    public function destroy($id)
+    // Pour confirmer une réservation après paiement
+    public function confirm($id)
     {
-        $deleted = $this->reservationRepository->delete($id);
-        if (!$deleted) {
-            return response()->json(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
-        }
-        return response()->json(['message' => 'Réservation supprimée'], Response::HTTP_OK);
+        $userId = Auth::id();
+        return $this->reservationService->confirmReservation($id, $userId);
     }
+    /**
+     * @OA\Put(
+     *     path="/api/reservations/{id}/cancel",
+     *     summary="Annuler une réservation",
+     *     description="Permet à l'utilisateur authentifié d'annuler une réservation si elle est encore en attente.",
+     *     tags={"Réservations"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la réservation à annuler",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Réservation annulée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Réservation annulée.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="La réservation ne peut pas être annulée",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Cette réservation ne peut pas être annulée.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Non authentifié"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Réservation non trouvée"
+     *     )
+     * )
+     */
+    // Pour annuler une réservation si le paiement n'a pas été effectué dans les 15 minutes
+    public function cancel($id)
+    {
+        $userId = Auth::id();  // Récupérer l'ID de l'utilisateur authentifié
+        return $this->reservationService->cancelReservation($id, $userId); // Annuler la réservation
+    }
+
+//    public function getReservations($userId)
+//    {
+//        $user = User::with('reservations.siege', 'reservations.seance')->find($userId);
+//
+//        if (!$user) {
+//            return response()->json(['error' => 'Utilisateur non trouvé'], 404);
+//        }
+//
+//        return response()->json($user->reservations);
+//    }
+
+
 }

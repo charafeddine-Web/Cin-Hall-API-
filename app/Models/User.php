@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
- use App\Models\Seances;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable  implements JWTSubject
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -20,10 +19,10 @@ class User extends Authenticatable  implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'FullName',
+        'name',
         'email',
         'password',
-        'role_id',
+        'role'
     ];
 
     /**
@@ -46,27 +45,35 @@ class User extends Authenticatable  implements JWTSubject
         'password' => 'hashed',
     ];
 
-
-    public function seances(){
-        return $this->belongsToMany(Seances::class,'reservations');
+//    public function reservations()
+//    {
+//        return $this->belongsToMany(Siege::class, 'reservations')
+//            ->withPivot('seance_id', 'status');
+//    }
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'user_id');
     }
-    public function role(){
-        return $this->belongsTo(roles::class);
-    }
 
+
+    /**
+     * Get the unique identifier for the user.
+     *
+     * @return mixed
+     */
     public function getJWTIdentifier()
     {
-        return $this->getKey();
+        return $this->getKey(); // Returning the primary key of the user
     }
 
+    /**
+     * Get custom claims for the JWT.
+     *
+     * @return array
+     */
     public function getJWTCustomClaims()
     {
-        return [];
-    }
-    public function hasPermission($permission)
-    {
-        $permissions = explode(',', $this->role->permissions ?? '');
-        return in_array($permission, $permissions);
+        return ['role' => $this->role];
     }
 
 
