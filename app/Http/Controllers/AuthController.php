@@ -10,8 +10,28 @@ use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
+/**
+ * @OA\Info(title="Auth API", version="1.0")
+ */
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="User login",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email", "password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Successful login", @OA\JsonContent()),
+     *     @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -31,7 +51,25 @@ class AuthController extends Controller
         ]);
     }
 
-
+    /**
+     * @OA\Post(
+     *     path="/api/register",
+     *     summary="User registration",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "email", "password", "role"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="role", type="string", enum={"admin", "spectateur"})
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User created successfully", @OA\JsonContent()),
+     *     @OA\Response(response=400, description="Validation error")
+     * )
+     */
     public function register(Request $request)
     {
         $request->validate([
@@ -57,10 +95,20 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="User logout",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Logout successful"),
+     *     @OA\Response(response=400, description="No token provided"),
+     *     @OA\Response(response=500, description="Logout failed")
+     * )
+     */
     public function logout()
     {
         try {
-            // Vérifie si un token est fourni
             if (!JWTAuth::getToken()) {
                 return response()->json(['error' => 'Aucun token fourni'], 400);
             }
@@ -73,59 +121,18 @@ class AuthController extends Controller
         }
     }
 
-    public function updateProfile(Request $request)
-    {
-        $user = auth()->user();
-
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $user->id,
-            'password' => 'sometimes|min:6'
-        ]);
-
-        if ($request->has('name')) {
-            $user->name = $request->name;
-        }
-
-        if ($request->has('email')) {
-            $user->email = $request->email;
-        }
-
-        if ($request->has('password')) {
-            $user->password = bcrypt($request->password);
-        }
-
-        $user->save();
-
-        return response()->json([
-            'message' => 'Profil mis à jour avec succès',
-            'user' => $user
-        ]);
-    }
-
-    public function deleteAccount()
-    {
-        $user = auth()->user();
-
-        $user->delete();
-
-        return response()->json([
-            'message' => 'Compte supprimé avec succès'
-        ]);
-    }
-
-
+    /**
+     * @OA\Get(
+     *     path="/api/me",
+     *     summary="Get current user details",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="User data retrieved successfully"),
+     *     @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
     public function me()
     {
         return response()->json(Auth::user());
-    }
-
-    private function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
-        ]);
     }
 }

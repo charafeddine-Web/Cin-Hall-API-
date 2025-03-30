@@ -212,13 +212,13 @@ class ReservationService
         $seance = $this->seanceRepository->getSeance($reservation->seance_id);
         $siege = $this->siegeRepository->getSiege($reservation->siege_id);
         $film = $this->filmRepository->getFilm($seance->film_id);
-       // $user = $this->UserRepository->getUser($reservation->user_id);
+        $user = $this->UserRepository->getUser($reservation->user_id);
         $data = [
             'reservation' => $reservation,
             'seance' => $seance,
             'siege' => $siege,
             'film' => $film,
-          //  'user' => $user,
+            'user' => $user,
         ];
         return $data ;
     }

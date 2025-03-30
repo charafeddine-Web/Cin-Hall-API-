@@ -65,13 +65,17 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/payment', [PaymentController::class, 'createCheckoutSession'])->name('payment.create');
     Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
     Route::post('/stripe/webhook', [PaymentController::class, 'handleWebhook']);
+
+//Quand tu ouvres le lien de paiement Stripe dans le navigateur, Laravel ne sait pas que tu es authentifié sur Postman. L'authentification est stockée dans une session ou via un token, mais quand Stripe redirige après le paiement, le navigateur ne transmet pas l'authentification.
+//👉 Résultat : Laravel pense que tu n'es pas connecté et essaie de te rediriger vers /login, mais cette route n'existe pas.
+    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+
+    //generer pdf ticket
+    Route::get('/generate-ticket/{reservationId}', [TicketController::class, 'generateTicket']);
+
 });
 
 
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-//Quand tu ouvres le lien de paiement Stripe dans le navigateur, Laravel ne sait pas que tu es authentifié sur Postman. L'authentification est stockée dans une session ou via un token, mais quand Stripe redirige après le paiement, le navigateur ne transmet pas l'authentification.
-//
-//👉 Résultat : Laravel pense que tu n'es pas connecté et essaie de te rediriger vers /login, mais cette route n'existe pas.
 
 
 // genere pdf  test
@@ -89,9 +93,6 @@ Route::get('/payment/success', [PaymentController::class, 'success'])->name('pay
 //} ;
 
 
-//generer pdf ticket
-
-Route::get('/generate-ticket/{reservationId}', [TicketController::class, 'generateTicket']);
 
 
 

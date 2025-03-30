@@ -6,6 +6,46 @@ use Illuminate\Support\Facades\DB;
 
 class DashBoardController
 {
+    /**
+     * @OA\Get(
+     *     path="/api/dashboard/stats",
+     *     summary="Obtenir les statistiques du tableau de bord",
+     *     tags={"Dashboard"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Statistiques du tableau de bord récupérées avec succès",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="stats", type="object",
+     *                 @OA\Property(property="total_films", type="integer"),
+     *                 @OA\Property(property="total_seances", type="integer"),
+     *                 @OA\Property(property="total_reservations", type="integer")
+     *             ),
+     *             @OA\Property(property="tauxOccupation", type="array",
+     *                 @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="titre", type="string"),
+     *                     @OA\Property(property="places_reservees", type="integer"),
+     *                     @OA\Property(property="taux_occupation", type="number")
+     *                 )
+     *             ),
+     *             @OA\Property(property="revenusParFilm", type="array",
+     *                 @OA\Items(type="object",
+     *                     @OA\Property(property="titre", type="string"),
+     *                     @OA\Property(property="tickets_vendus", type="integer"),
+     *                     @OA\Property(property="revenus_total", type="number")
+     *                 )
+     *             ),
+     *             @OA\Property(property="filmsPopulaires", type="array",
+     *                 @OA\Items(type="object",
+     *                     @OA\Property(property="titre", type="string"),
+     *                     @OA\Property(property="nombre_reservations", type="integer")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function getDashboardStats()
     {
         $stats = [
@@ -47,7 +87,6 @@ class DashBoardController
             'tauxOccupation' => $tauxOccupation,
             'revenusParFilm' => $revenusParFilm,
             'filmsPopulaires' => $filmsPopulaires,
-
-        ]) ;
-}
+        ]);
+    }
 }
