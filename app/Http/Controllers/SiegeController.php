@@ -4,12 +4,7 @@ namespace App\Http\Controllers;
 use App\Services\SiegeService;
 use Illuminate\Http\Request;
 
-/**
- * @OA\Tag(
- *     name="Sièges",
- *     description="Gestion des sièges de cinéma"
- * )
- */
+
 class SiegeController extends Controller
 {
     protected $siegeService;

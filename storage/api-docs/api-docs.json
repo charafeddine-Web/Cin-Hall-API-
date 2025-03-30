@@ -1,19 +1,409 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "CinéHall API Documentation",
-        "description": "Documentation de l'API CinéHall",
+        "title": "Cinema API",
+        "description": "API for Cinema",
         "version": "1.0.0"
     },
+    "servers": [
+        {
+            "url": "http://localhost/api",
+            "description": "Localhost API Server"
+        }
+    ],
     "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User login",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User registration",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "admin",
+                                            "spectateur"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User logout",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful"
+                    },
+                    "400": {
+                        "description": "No token provided"
+                    },
+                    "500": {
+                        "description": "Logout failed"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get current user details",
+                "operationId": "9d9bc556f927575aa492a88c28fe5908",
+                "responses": {
+                    "200": {
+                        "description": "User data retrieved successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/stats": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Obtenir les statistiques du tableau de bord",
+                "operationId": "80bfae6cf0cffcbaf1abe63861e910a8",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques du tableau de bord récupérées avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "stats": {
+                                            "properties": {
+                                                "total_films": {
+                                                    "type": "integer"
+                                                },
+                                                "total_seances": {
+                                                    "type": "integer"
+                                                },
+                                                "total_reservations": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "tauxOccupation": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "titre": {
+                                                        "type": "string"
+                                                    },
+                                                    "places_reservees": {
+                                                        "type": "integer"
+                                                    },
+                                                    "taux_occupation": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "revenusParFilm": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "titre": {
+                                                        "type": "string"
+                                                    },
+                                                    "tickets_vendus": {
+                                                        "type": "integer"
+                                                    },
+                                                    "revenus_total": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "filmsPopulaires": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "titre": {
+                                                        "type": "string"
+                                                    },
+                                                    "nombre_reservations": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/films": {
+            "get": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Récupérer la liste des films",
+                "operationId": "6f65b2a58d7d23ba8303a3417286ca1e",
+                "responses": {
+                    "200": {
+                        "description": "Liste des films récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Créer un nouveau film",
+                "operationId": "0482350b6bb91a266d32d025168f57b5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Film créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/films/{id}": {
+            "get": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Récupérer un film par ID",
+                "operationId": "03b45f8ed38b04cbbdc7fccfef95e3a0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du film",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Mettre à jour un film",
+                "operationId": "8db28d253c2b25c3c51fbb15044064b9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du film à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Film mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Films"
+                ],
+                "summary": "Supprimer un film",
+                "operationId": "f1bb0be2efde712999e86b3fe0c8d0db",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du film à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film supprimé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/payment": {
             "post": {
                 "tags": [
                     "Payment"
                 ],
                 "summary": "Créer une session de paiement Stripe",
-                "description": "Cette méthode crée une session de paiement Stripe pour la réservation d'un film.",
-                "operationId": "4921a8411ee511e2b1a2d10d6ea8f6f7",
+                "operationId": "49b2adac8bfb395a82d3ec0696bceac3",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -24,7 +414,6 @@
                                 ],
                                 "properties": {
                                     "reservation_id": {
-                                        "description": "ID de la réservation",
                                         "type": "integer",
                                         "example": 1
                                     }
@@ -42,7 +431,6 @@
                                 "schema": {
                                     "properties": {
                                         "url": {
-                                            "description": "URL pour le paiement",
                                             "type": "string",
                                             "example": "https://checkout.stripe.com/pay/cs_test_abc123"
                                         }
@@ -53,66 +441,94 @@
                         }
                     },
                     "400": {
-                        "description": "Erreur lors de la création de la session de paiement.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "description": "Message d'erreur détaillé",
-                                            "type": "string",
-                                            "example": "message d'erreur"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Erreur lors de la création de la session de paiement."
                     },
                     "401": {
-                        "description": "Utilisateur non authentifié.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "description": "Message d'erreur pour l'authentification",
-                                            "type": "string",
-                                            "example": "Utilisateur non authentifié."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Utilisateur non authentifié."
                     },
                     "404": {
-                        "description": "Réservation introuvable.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "description": "Message d'erreur si la réservation n'existe pas",
-                                            "type": "string",
-                                            "example": "Réservation introuvable."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Réservation introuvable."
+                    }
+                }
+            }
+        },
+        "/api/payment/success": {
+            "get": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Gérer le succès du paiement",
+                "operationId": "316a026cd7be78c056c5a0e6738cb30a",
+                "responses": {
+                    "200": {
+                        "description": "Réservation confirmée avec succès."
+                    },
+                    "404": {
+                        "description": "Réservation introuvable."
+                    }
+                }
+            }
+        },
+        "/api/payment/cancel": {
+            "get": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Gérer l'annulation du paiement",
+                "operationId": "f6085ddde73f2b527960ae0d2d47bc0a",
+                "responses": {
+                    "200": {
+                        "description": "Le paiement a été annulé."
+                    }
+                }
+            }
+        },
+        "/api/payment/webhook": {
+            "post": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Gérer les webhooks Stripe",
+                "operationId": "babaaa58e0c82f77ab41c71e9cf7c2f6",
+                "responses": {
+                    "200": {
+                        "description": "Événement traité avec succès."
+                    },
+                    "500": {
+                        "description": "Erreur lors du traitement du webhook."
                     }
                 }
             }
         },
         "/api/reservations": {
+            "get": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Obtenir toutes les réservations",
+                "operationId": "fbc6050d9f7fdb07075d3aaeb157ffa9",
+                "responses": {
+                    "200": {
+                        "description": "Liste des réservations de l'utilisateur"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "404": {
+                        "description": "Aucune réservation trouvée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Réservations"
                 ],
                 "summary": "Créer une nouvelle réservation",
-                "description": "Ajoute une réservation pour l'utilisateur authentifié.",
                 "operationId": "01e3d21dc330a31de025203bc142ffa3",
                 "requestBody": {
                     "required": true,
@@ -125,12 +541,10 @@
                                 ],
                                 "properties": {
                                     "seance_id": {
-                                        "description": "ID de la séance à réserver",
                                         "type": "integer",
                                         "example": 2
                                     },
                                     "siege_id": {
-                                        "description": "ID du siège sélectionné",
                                         "type": "integer",
                                         "example": 15
                                     }
@@ -142,57 +556,10 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Réservation créée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "reservation": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "user_id": {
-                                                    "type": "integer",
-                                                    "example": 3
-                                                },
-                                                "seance_id": {
-                                                    "type": "integer",
-                                                    "example": 2
-                                                },
-                                                "siege_id": {
-                                                    "type": "integer",
-                                                    "example": 15
-                                                },
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "pending"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Réservation créée avec succès"
                     },
                     "400": {
-                        "description": "Erreur de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Le siège est déjà réservé."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Erreur de validation"
                     },
                     "401": {
                         "description": "Non authentifié"
@@ -211,17 +578,14 @@
                     "Réservations"
                 ],
                 "summary": "Mettre à jour une réservation",
-                "description": "Mise à jour des informations d'une réservation existante.",
                 "operationId": "02fa683a9f80a0563596fb06685bcbc7",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la réservation à mettre à jour",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "integer"
                         }
                     }
                 ],
@@ -231,27 +595,19 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "user_id",
                                     "siege_id",
                                     "seance_id",
                                     "status"
                                 ],
                                 "properties": {
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
                                     "siege_id": {
-                                        "type": "integer",
-                                        "example": 10
+                                        "type": "integer"
                                     },
                                     "seance_id": {
-                                        "type": "integer",
-                                        "example": 3
+                                        "type": "integer"
                                     },
                                     "status": {
-                                        "type": "string",
-                                        "example": "confirmed"
+                                        "type": "string"
                                     }
                                 },
                                 "type": "object"
@@ -261,32 +617,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Réservation mise à jour avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer",
-                                            "example": 1
-                                        },
-                                        "siege_id": {
-                                            "type": "integer",
-                                            "example": 10
-                                        },
-                                        "seance_id": {
-                                            "type": "integer",
-                                            "example": 3
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "pending"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Réservation mise à jour"
                     },
                     "400": {
                         "description": "Données invalides"
@@ -311,61 +642,20 @@
                     "Réservations"
                 ],
                 "summary": "Confirmer une réservation",
-                "description": "Confirme une réservation en attente.",
                 "operationId": "fd980d13ae409543e71aafa7f1545145",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la réservation à confirmer",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "integer"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Réservation confirmée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Réservation confirmée."
-                                        },
-                                        "reservation": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "user_id": {
-                                                    "type": "integer",
-                                                    "example": 3
-                                                },
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "confirmed"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2025-03-28 14:00:00"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Impossible de confirmer la réservation"
+                        "description": "Réservation confirmée"
                     },
                     "404": {
                         "description": "Réservation non trouvée"
@@ -384,55 +674,23 @@
                     "Réservations"
                 ],
                 "summary": "Annuler une réservation",
-                "description": "Permet à l'utilisateur authentifié d'annuler une réservation si elle est encore en attente.",
                 "operationId": "5be442dcd89e3a479121b9fae7d9c649",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la réservation à annuler",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "integer"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Réservation annulée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Réservation annulée."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Réservation annulée"
                     },
                     "400": {
-                        "description": "La réservation ne peut pas être annulée",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Cette réservation ne peut pas être annulée."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié"
+                        "description": "La réservation ne peut pas être annulée"
                     },
                     "404": {
                         "description": "Réservation non trouvée"
@@ -554,26 +812,6 @@
                                                 }
                                             },
                                             "type": "object"
-                                        },
-                                        "sieges": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "salle_id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "siege_number": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -585,12 +823,41 @@
             }
         },
         "/api/salles/{id}": {
+            "get": {
+                "tags": [
+                    "Salles"
+                ],
+                "summary": "Récupérer une salle",
+                "operationId": "a287b158cafff514dd9c53ee7a49f674",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la salle",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la salle",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "Salles"
                 ],
                 "summary": "Modifier une salle existante",
-                "description": "Met à jour les informations d'une salle donnée.",
                 "operationId": "793e23dc6c0e57920025ac90b8b9ed0c",
                 "parameters": [
                     {
@@ -603,32 +870,151 @@
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "Salle mise à jour avec succès"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Salles"
+                ],
+                "summary": "Supprimer une salle",
+                "operationId": "c33650c54b56a6994dc255fba62d9e12",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la salle",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Salle supprimée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/seances": {
+            "get": {
+                "tags": [
+                    "Séances"
+                ],
+                "summary": "Liste toutes les séances",
+                "description": "Récupère la liste de toutes les séances de cinéma.",
+                "operationId": "eb8af953bc7b9646b2294583ed472f06",
+                "responses": {
+                    "200": {
+                        "description": "Succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "film_id": {
+                                                "type": "integer",
+                                                "example": 10
+                                            },
+                                            "salle_id": {
+                                                "type": "integer",
+                                                "example": 3
+                                            },
+                                            "start_time": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-04-01T14:00:00Z"
+                                            },
+                                            "session": {
+                                                "type": "string",
+                                                "example": "Soir"
+                                            },
+                                            "langue": {
+                                                "type": "string",
+                                                "example": "Français"
+                                            },
+                                            "type_seance": {
+                                                "type": "string",
+                                                "example": "VIP"
+                                            },
+                                            "prix": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 12.5
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Séances"
+                ],
+                "summary": "Créer une nouvelle séance",
+                "description": "Ajoute une nouvelle séance de cinéma.",
+                "operationId": "c4cf111697bf9bcbe40078debd8842f6",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "nom",
-                                    "capacite",
-                                    "type"
+                                    "film_id",
+                                    "salle_id",
+                                    "start_time",
+                                    "session",
+                                    "langue",
+                                    "type_seance",
+                                    "prix"
                                 ],
                                 "properties": {
-                                    "nom": {
-                                        "type": "string",
-                                        "example": "Salle VIP"
-                                    },
-                                    "capacite": {
+                                    "film_id": {
                                         "type": "integer",
-                                        "example": 120
+                                        "example": 10
                                     },
-                                    "type": {
+                                    "salle_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-04-01T14:00:00Z"
+                                    },
+                                    "session": {
+                                        "type": "string",
+                                        "example": "Soir"
+                                    },
+                                    "langue": {
+                                        "type": "string",
+                                        "example": "Français"
+                                    },
+                                    "type_seance": {
                                         "type": "string",
                                         "enum": [
                                             "Normale",
                                             "VIP"
                                         ],
                                         "example": "VIP"
+                                    },
+                                    "prix": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 12.5
                                     }
                                 },
                                 "type": "object"
@@ -637,32 +1023,45 @@
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "Salle mise à jour avec succès",
+                    "201": {
+                        "description": "Séance créée avec succès",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "salle": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "nom": {
-                                                    "type": "string",
-                                                    "example": "Salle VIP"
-                                                },
-                                                "capacite": {
-                                                    "type": "integer",
-                                                    "example": 120
-                                                },
-                                                "type": {
-                                                    "type": "string",
-                                                    "example": "VIP"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "film_id": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "salle_id": {
+                                            "type": "integer",
+                                            "example": 3
+                                        },
+                                        "start_time": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-04-01T14:00:00Z"
+                                        },
+                                        "session": {
+                                            "type": "string",
+                                            "example": "Soir"
+                                        },
+                                        "langue": {
+                                            "type": "string",
+                                            "example": "Français"
+                                        },
+                                        "type_seance": {
+                                            "type": "string",
+                                            "example": "VIP"
+                                        },
+                                        "prix": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 12.5
                                         }
                                     },
                                     "type": "object"
@@ -672,12 +1071,295 @@
                     }
                 }
             }
+        },
+        "/api/seances/type/{type}": {
+            "get": {
+                "tags": [
+                    "Séances"
+                ],
+                "summary": "Filtrer les séances par type",
+                "description": "Récupère les séances en fonction de leur type (Normale ou VIP).",
+                "operationId": "c85ed350dd9cabb12aa45f8e612530be",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "path",
+                        "description": "Type de séance (Normale ou VIP)",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succès"
+                    },
+                    "400": {
+                        "description": "Type invalide"
+                    },
+                    "404": {
+                        "description": "Aucune séance trouvée"
+                    }
+                }
+            }
+        },
+        "/api/sieges": {
+            "get": {
+                "tags": [
+                    "Sièges"
+                ],
+                "summary": "Liste tous les sièges",
+                "operationId": "531406aa02bcc8daa1024b0d0bf8d211",
+                "responses": {
+                    "200": {
+                        "description": "Liste des sièges",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "salle_id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            },
+                                            "numero": {
+                                                "type": "string",
+                                                "example": "A1"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "example": "standard"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Sièges"
+                ],
+                "summary": "Créer un nouveau siège",
+                "operationId": "7f902b5096b6baa74609047df14e0c17",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "salle_id",
+                                    "numero",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "salle_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "numero": {
+                                        "type": "string",
+                                        "example": "A1"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "standard",
+                                            "couple"
+                                        ],
+                                        "example": "standard"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Siège créé avec succès"
+                    }
+                }
+            }
+        },
+        "/api/sieges/{id}": {
+            "get": {
+                "tags": [
+                    "Sièges"
+                ],
+                "summary": "Afficher un siège spécifique",
+                "operationId": "27a0258ff8f65e9e50724cb162a6cb76",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du siège",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails du siège",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "salle_id": {
+                                            "type": "integer",
+                                            "example": 2
+                                        },
+                                        "numero": {
+                                            "type": "string",
+                                            "example": "A1"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "standard"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Sièges"
+                ],
+                "summary": "Modifier un siège",
+                "operationId": "ea1af9acbcca1bde2f35db805c70e2ae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du siège",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "numero": {
+                                        "type": "string",
+                                        "example": "B1"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "standard",
+                                            "couple"
+                                        ],
+                                        "example": "couple"
+                                    },
+                                    "reserve": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Siège mis à jour avec succès"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Sièges"
+                ],
+                "summary": "Supprimer un siège",
+                "operationId": "6315936cee7cc876c8f4186c08fae281",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du siège",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Siège supprimé avec succès"
+                    }
+                }
+            }
+        },
+        "/tickets/{reservationId}": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Generate a PDF ticket for a given reservation",
+                "description": "Generates a ticket in PDF format with reservation details and QR code.",
+                "operationId": "generateTicket",
+                "parameters": [
+                    {
+                        "name": "reservationId",
+                        "in": "path",
+                        "description": "ID of the reservation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket PDF generated successfully",
+                        "content": {
+                            "application/pdf": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Reservation not found"
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
-            "name": "Salles",
-            "description": "Gestion des salles de cinéma"
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Dashboard"
+        },
+        {
+            "name": "Films",
+            "description": "Films"
         },
         {
             "name": "Payment",
@@ -686,6 +1368,22 @@
         {
             "name": "Réservations",
             "description": "Réservations"
+        },
+        {
+            "name": "Salles",
+            "description": "Salles"
+        },
+        {
+            "name": "Séances",
+            "description": "Séances"
+        },
+        {
+            "name": "Sièges",
+            "description": "Sièges"
+        },
+        {
+            "name": "Tickets",
+            "description": "Tickets"
         }
     ]
 }

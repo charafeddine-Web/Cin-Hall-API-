@@ -11,7 +11,15 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 /**
- * @OA\Info(title="Auth API", version="1.0")
+ * @OA\Info(
+ *     title="Cinema API",
+ *     version="1.0.0",
+ *     description="API for Cinema",
+ * )
+ * @OA\Server(
+ *     url="http://localhost/api",
+ *     description="Localhost API Server"
+ * )
  */
 class AuthController extends Controller
 {

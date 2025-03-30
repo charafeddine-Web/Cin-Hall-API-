@@ -5,18 +5,6 @@ use App\Services\SalleService;
 use App\Services\SiegeService;
 use Illuminate\Http\Request;
 
-/**
- * @OA\Info(
- *      title="CinéHall API Documentation",
- *      version="1.0.0",
- *      description="Documentation de l'API CinéHall"
- * )
- *
- * @OA\Tag(
- *     name="Salles",
- *     description="Gestion des salles de cinéma"
- * )
- */
 class SalleController extends Controller
 {
     protected $salleService;

@@ -6,9 +6,7 @@ use App\Services\ReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * @OA\Tag(name="Réservations", description="Gestion des réservations")
- */
+
 class ReservationController extends Controller
 {
     protected $reservationService;

@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\FilmService;
 use Illuminate\Http\Request;
 
-/**
- * @OA\Tag(name="Films", description="Endpoints pour gérer les films")
- */
+
 class FilmController extends Controller
 {
     protected $filmService;

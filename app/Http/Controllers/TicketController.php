@@ -7,17 +7,6 @@ use Barryvdh\DomPDF\Facade\PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Response;
 
-/**
- * @OA\Info(
- *     title="Ticket API",
- *     version="1.0.0",
- *     description="API for generating PDF tickets for reservations",
- * )
- * @OA\Server(
- *     url="http://localhost/api",
- *     description="Localhost API Server"
- * )
- */
 class TicketController extends Controller
 {
     private $reservationService;

@@ -12,9 +12,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Models\Reservation;
 
-/**
- * @OA\Tag(name="Payment", description="Gestion des paiements via Stripe")
- */
+
 class PaymentController extends Controller
 {
     protected $reservationService;

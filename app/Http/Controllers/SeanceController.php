@@ -6,12 +6,7 @@ use App\Models\Seance;
 use App\Services\SeanceService;
 use Illuminate\Http\Request;
 
-/**
- * @OA\Tag(
- *     name="Séances",
- *     description="Gestion des séances de cinéma"
- * )
- */
+
 class SeanceController extends Controller
 {
     protected $seanceService;
