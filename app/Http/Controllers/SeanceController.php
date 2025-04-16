@@ -41,9 +41,14 @@ class SeanceController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->seanceService->getAllSeances());
+        $filmId = $request->query('film_id');
+        $type = $request->query('type');
+
+        return response()->json(
+            $this->seanceService->getAllSeances($filmId, $type)
+        );
     }
 
     /**

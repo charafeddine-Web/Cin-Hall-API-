@@ -34,8 +34,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/profile', [AuthController::class, 'show']);
     Route::put('/profile', [AuthController::class, 'updateProfile']);
-    Route::delete('/profile/', [AuthController::class, 'deleteAccount']);
+    Route::delete('/profile', [AuthController::class, 'deleteAccount']);
 });
 
 
@@ -43,25 +44,32 @@ Route::middleware('auth:api')->group(function () {
 Route::get('/seances/{idfilm}', [SeanceController::class, 'getAllSeancesWithFilms']);
 Route::get('/seances/{type}', [SeanceController::class, 'showByType']);// avec query ?type=VIP
 
+// Pour tout utilisateur connecté
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('films', FilmController::class);
+    Route::apiResource('seances', SeanceController::class);
+    Route::get('/seances/{id}/sieges', [SiegeController::class, 'getBySeance']);
+});
 
 // Routes accessibles uniquement aux **administrateurs**
 Route::middleware(['auth:api', 'role:admin'])->group(function () {
-    Route::apiResource('films', FilmController::class);
-    Route::apiResource('salles', SalleController::class);
-    Route::apiResource('seances', SeanceController::class);
-    Route::apiResource('sieges', SiegeController::class);
+//    Route::apiResource('films', FilmController::class);
+//    Route::apiResource('salles', SalleController::class);
+//    Route::apiResource('seances', SeanceController::class);
+//    Route::apiResource('sieges', SiegeController::class);
 
     // Méthodes personnalisées de reservation
-    Route::post('/reservations/{id}/confirm', [ReservationController::class, 'confirm']);
-    Route::post('/reservations/{id}/cancel', [ReservationController::class, 'cancel']);
+//    Route::patch('/reservations/{id}/confirm', [ReservationController::class, 'confirm']);
+//    Route::patch('/reservations/{id}/cancel', [ReservationController::class, 'cancel']);
 
     //statistique
     Route::get('/admin/dashboard', [DashboardController::class, 'getDashboardStats']);
-
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::resource('reservations', ReservationController::class);
+    Route::apiResource('reservations', ReservationController::class);
+//    Route::post('/reservations', [ReservationController::class, 'createReservation']);
+
     //paiment
     Route::post('/payment', [PaymentController::class, 'createCheckoutSession'])->name('payment.create');
     Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
@@ -77,21 +85,6 @@ Route::middleware('auth:api')->group(function () {
 });
 
 
-
-
-// genere pdf  test
-
-//use Barryvdh\DomPDF\Facade\Pdf;
-
-//Route::get('/generate-pdf', function () {
-//    $data = [
-//        'title' => 'Test PDF',
-//        'content' => 'This is a PDF generated from Laravel'
-//    ];
-//
-//    $pdf = PDF::loadView('pdf.template', $data);
-//    return $pdf->download('generated-file.pdf');
-//} ;
 
 
 

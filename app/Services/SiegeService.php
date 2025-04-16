@@ -54,4 +54,12 @@ class SiegeService
 
         return $sieges;
     }
+
+
+    public function getSiegesBySeance($seance)
+    {
+        $salle = $seance->salle;
+        return $this->siegeRepo->getBySalle($salle->id);
+    }
+
 }

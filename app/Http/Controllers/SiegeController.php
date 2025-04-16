@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Seance;
 use App\Services\SiegeService;
 use Illuminate\Http\Request;
 
@@ -169,4 +170,43 @@ class SiegeController extends Controller
         $this->siegeService->deleteSiege($id);
         return response()->json(['message' => 'Siège supprimé avec succès']);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/seances/{id}/sieges",
+     *     summary="Récupère les sièges d'une salle pour une séance",
+     *     tags={"Sièges"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la séance",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des sièges"
+     *     )
+     * )
+     */
+    public function getBySeance($id)
+    {
+        $seance = Seance::with('salle')->find($id);
+
+        if (!$seance) {
+            return response()->json(['message' => 'Séance non trouvée'], 404);
+        }
+
+        if (!$seance->salle) {
+            return response()->json(['message' => 'La séance n\'a pas de salle associée'], 400);
+        }
+
+        $sieges = $this->siegeService->getSiegesBySeance($seance);
+
+        return response()->json($sieges);
+    }
+
+
+
+
 }

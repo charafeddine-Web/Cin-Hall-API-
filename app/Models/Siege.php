@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Siege extends Model
 {
     use HasFactory;
-    protected $fillable=['numero' , 'type' , 'salle_id'];
+    protected $table = 'sieges';
+
+    protected $fillable=['numero' , 'type' , 'salle_id','reserve'];
 
 
 

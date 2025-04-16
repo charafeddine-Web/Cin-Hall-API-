@@ -10,10 +10,19 @@ use Illuminate\Support\Facades\DB;
 
 class SeanceRepository implements SeanceRepositoryInterface
 {
-    public function getAll()
+    public function getAll($filmId = null, $type = null)
     {
-        return Seance::all();
-    }
+        $query = Seance::with('film', 'salle'); // charge les relations si besoin
+
+        if ($filmId) {
+            $query->where('film_id', $filmId);
+        }
+
+        if ($type) {
+            $query->where('type_seance', $type);
+        }
+
+        return $query->get();    }
 
     public function findById($id)
 {

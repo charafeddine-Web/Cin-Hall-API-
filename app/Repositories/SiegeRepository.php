@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 
+use App\Models\Salle;
 use App\Models\Siege;
 use App\Repositories\Contracts\SiegeRepositoryInterface;
 
@@ -39,9 +40,24 @@ class SiegeRepository implements SiegeRepositoryInterface
         return false;
     }
 
-    public function getSiege( $siege_id)
+//    public function getSiege( $siege_id)
+//    {
+//        return Siege::find( $siege_id);
+//    }
+    public function getSiege(mixed $siege_id)
     {
-        return Siege::find( $siege_id);
+        return Siege::whereIn('id', $siege_id)->get();
     }
+
+    public function getBySalle($salleId)
+    {
+        return Siege::where('salle_id', $salleId)->get();
+    }
+
+
+
+
+
+
 
 }

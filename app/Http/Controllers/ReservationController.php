@@ -60,9 +60,13 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        $userId = Auth::id();
+        $request->validate([
+            'seance_id' => 'required|exists:seances,id',
+            'siege_id' => 'required|array',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
         $data = $request->all();
-        $data['user_id'] = $userId;
         return $this->reservationService->createReservation($data);
     }
 

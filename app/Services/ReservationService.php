@@ -30,7 +30,7 @@ class ReservationService
     {
         // Récupérer la séance et les sièges (collection)
         $seance = $this->seanceRepository->getSeance($data['seance_id']);
-        $sieges = $this->siegeRepository->getSiege($data['siege_id']); // Pas de first(), on veut une collection ici.
+        $sieges = $this->siegeRepository->getSiege($data['siege_id'] ?? null); // Pas de first(), on veut une collection ici.
 
         if ($sieges->isEmpty()) {
             return response()->json(['error' => 'Il y a un ou plusieurs sièges inexistants.'], 404);

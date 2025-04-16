@@ -23,6 +23,11 @@ use Tymon\JWTAuth\Exceptions\JWTException;
  */
 class AuthController extends Controller
 {
+    public function show()
+    {
+        return response()->json(auth()->user());
+    }
+
     /**
      * @OA\Post(
      *     path="/api/login",
@@ -54,7 +59,7 @@ class AuthController extends Controller
         }
         $user = auth()->user();
         return response()->json([
-            'token JWT' => $token,
+            'token' => $token,
             'user' => $user
         ]);
     }
@@ -91,7 +96,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role
+            'role' => $validated['role'] ?? 'spectateur',
         ]);
 
         $token = JWTAuth::fromUser($user);
@@ -99,7 +104,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Utilisateur créé avec succès',
             'user' => $user,
-            'token JWT' => $token
+            'token' => $token
         ], 201);
     }
 
@@ -143,4 +148,30 @@ class AuthController extends Controller
     {
         return response()->json(Auth::user());
     }
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . auth()->user()->id,
+            'password' => 'nullable|min:6',
+        ]);
+
+        $user = auth()->user();
+
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user
+        ]);
+    }
+
+
 }

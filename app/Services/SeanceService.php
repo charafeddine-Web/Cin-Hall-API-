@@ -13,9 +13,9 @@ class SeanceService
         $this->seanceRepository = $seanceRepository;
     }
 
-    public function getAllSeances()
+    public function getAllSeances($filmId = null, $type = null)
     {
-        return $this->seanceRepository->getAll();
+        return $this->seanceRepository->getAll($filmId = null, $type = null);
     }
 
     public function createSeance(array $data)
